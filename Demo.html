@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Canvas图表</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="renderer" content="webkit">
+<!--[if lt IE 9]>
+<script src="http://apps.bdimg.com/libs/html5shiv/3.7/html5shiv.min.js"></script>
+<script src="excanvas.js"></script>
+<![endif]-->
+<style>
+    #box {
+        width: 1000px;
+        text-align: center;
+        margin: 100px auto;
+    }
+</style>
+</head>
+<body>
+    <div id="box">
+        <canvas id="meter" width="360" height="220"></canvas>
+        <canvas id="radar" width="538" height="370"></canvas>
+    </div>
+<script src="chart.meter.js"></script>
+<script src="chart.radar.js"></script>
+<script>
+onload = function(){
+    Meter.setOptions({
+        element: 'meter',
+        centerPoint: {
+            x: 180,
+            y: 180
+        },
+        radius: 180,
+        data: {
+            value: 668,
+            title: '职场竞争力{t}',
+            subTitle: '评估时间：2015.07.28',
+            area: [{
+                min: 350, max: 550, text: '较弱'
+            },{
+                min: 550, max: 600, text: '一般'
+            },{
+                min: 600, max: 650, text: '很强'
+            },{
+                min: 650, max: 700, text: '超强'
+            },{
+                min: 700, max: 950, text: '极强'
+            }]
+        }
+    }).init(); 
+
+    Radar.setOptions({
+        element: 'radar',
+        radius: 140,
+        polar: [
+            { text: '简历信息', max: 190, icon: { sx: 0, sy: 0, w: 32, h: 33, l: -17, t: -60 } },
+            { text: '职场身份', max: 190, icon: { sx: 32, sy: 0, w: 30, h: 33, l: 30, t: -30 } },
+            { text: '九博成长', max: 190, icon: { sx: 61, sy: 0, w: 32, h: 33, l: 10, t: 0 } },
+            { text: '职场活力', max: 190, icon: { sx: 93, sy: 0, w: 31, h: 33, l: -40, t: 0 } },
+            { text: '人脉社交', max: 190, icon: { sx: 124, sy: 0, w: 29, h: 33, l: -60, t: -30 } }
+        ],
+        title: '{v}',
+        data: [130, 130, 130, 148, 130],
+        styles: {
+            label: {
+                image: 'icon.png'
+            }
+        }
+    }).init();
+}
+</script>
+</body>
+</html>
