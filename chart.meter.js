@@ -1,8 +1,8 @@
 /**
  * 
  * @authors 王昱森
- * @date    2015-07-26 07:58:47
- * @version 1.0.2
+ * @date    2015-08-14 11:31:56
+ * @version 1.0.3
  */
 var Meter = (function () {
 
@@ -86,7 +86,7 @@ var Meter = (function () {
         }
     }
 
-    var cellLocation = function(r, end){
+    var calcLocation = function(r, end){
 
         return {
             x: options.centerPoint.x + r * Math.cos(Math.PI * end),
@@ -94,7 +94,7 @@ var Meter = (function () {
         };
     }
 
-    var cellValueRange = function(value){
+    var calcValueRange = function(value){
         var data = options.data.area,
             index = data.length - 1;
 
@@ -235,7 +235,7 @@ var Meter = (function () {
 
     var drawArrow = function(valueRange){
         var r = options.radius - areaStyle.radius - labelStyle.radius,
-            loc = cellLocation(r, valueRange.range),
+            loc = calcLocation(r, valueRange.range),
             x = loc.x - 1, 
             y = loc.y + 0.5;
 
@@ -246,9 +246,9 @@ var Meter = (function () {
             style: rangeStyle.color
         });
         
-        var a = cellLocation(r - rangeStyle.arrow.height, valueRange.range),
-            b = cellLocation(r, valueRange.range - 0.01),
-            c = cellLocation(r, valueRange.range + 0.01);
+        var a = calcLocation(r - rangeStyle.arrow.height, valueRange.range),
+            b = calcLocation(r, valueRange.range - 0.01),
+            c = calcLocation(r, valueRange.range + 0.01);
 
         context.beginPath();
         context.moveTo(a.x - 1, a.y + 0.5);
@@ -284,8 +284,8 @@ var Meter = (function () {
 
         for(var j = 1; j < len; j++){
             drawLine({
-                start: cellLocation(options.radius, sAngle + range * j),
-                end: cellLocation(options.radius - areaStyle.radius, sAngle + range * j),
+                start: calcLocation(options.radius, sAngle + range * j),
+                end: calcLocation(options.radius - areaStyle.radius, sAngle + range * j),
                 style: areaStyle.lineColor,
                 width: j % scaleLength == 0 ? areaStyle.lineWidth: areaStyle.scaleWidth
             });
@@ -309,7 +309,7 @@ var Meter = (function () {
             lblR = options.radius - areaStyle.radius - lblOpt.radius/2;
 
         for(var k = 0; k <= lblLen; k++){
-            var loc = cellLocation(lblR, sAngle + lblRange * k);
+            var loc = calcLocation(lblR, sAngle + lblRange * k);
             lblOpt.x = loc.x;
             lblOpt.y = loc.y;
             lblOpt.text = lblArr[k];
@@ -328,7 +328,7 @@ var Meter = (function () {
             context.fillRect(0, 0, w, h);
 
             valueTemp = valueTemp + 10 > value ? value: valueTemp + 10;
-            var valueRange = cellValueRange(valueTemp);
+            var valueRange = calcValueRange(valueTemp);
 
             drawArea();
             drawValueRange(valueRange);
