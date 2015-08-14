@@ -1,8 +1,8 @@
 /**
  * 
  * @authors 王昱森
- * @date    2015-07-28 15:40:02
- * @version 1.0.2
+ * @date    2015-08-14 11:31:44
+ * @version 1.0.3
  */
 
 var Radar = (function(){
@@ -64,7 +64,7 @@ var Radar = (function(){
         }
     }
 
-    var cellLocation = function(cp, r, end){
+    var calcLocation = function(cp, r, end){
 
         return {
             x: cp[0] + r * Math.cos(Math.PI * end),
@@ -104,12 +104,7 @@ var Radar = (function(){
         context.fillText(opts.text, opts.x, opts.y); 
     }
 
-    var drawOuter = function(borderLoc, polar) {
-        drawLine({
-            lines: borderLoc,
-            style: borderStyle.color,
-            width: borderStyle.width
-        });
+    var drawIcon = function(borderLoc, polar) {
 
         var img = new Image();
         img.src = labelStyle.image;
@@ -135,6 +130,12 @@ var Radar = (function(){
     }
 
     var drawInner = function(cp, valueRangeLoc, borderLoc, innerLoc, valueSum) {
+        drawLine({
+            lines: borderLoc,
+            style: borderStyle.color,
+            width: borderStyle.width
+        });
+
         drawLine({
             lines: valueRangeLoc,
             style: valueRangeStyle.border.color,
@@ -178,6 +179,30 @@ var Radar = (function(){
         }
     }
 
+    var calcRedrawPath = function(borderLoc){
+        var startLoc = borderLoc[0];
+        var minX = startLoc.x, 
+            minY = startLoc.y, 
+            maxX = startLoc.x, 
+            maxY = startLoc.y;
+
+        for(var i = 1; i < borderLoc.length; i ++) {
+            var loc = borderLoc[i];
+            minX = loc.x < minX ? loc.x : minX;
+            minY = loc.y < minY ? loc.y : minY;
+            maxX = loc.x > maxX ? loc.x : maxX;
+            maxY = loc.y > maxY ? loc.y : maxY;
+        }
+
+        var borderW = borderStyle.width;
+        return {
+            x: minX - borderW,
+            y: minY - borderW,
+            w: maxX - minX + borderW * 2,
+            h: maxY - minY + borderW * 2
+        };
+    }
+
     var drawing = function(cp, w, h){
         var polar = options.polar,
             polarCount = polar.length,
@@ -193,10 +218,15 @@ var Radar = (function(){
 
             var end = 1.5 + i * (2/polarCount);
             angles.push(end);
-            borderLoc.push(cellLocation(cp, radius, end));
+            borderLoc.push(calcLocation(cp, radius, end));
         }
 
-        
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, w, h);
+
+        drawIcon(borderLoc, polar);
+
+        var redrawPath = calcRedrawPath(borderLoc);
 
         var timer = setInterval(function(){
 
@@ -215,11 +245,11 @@ var Radar = (function(){
 
                 // inner
                 var ir = innerStyle.radius;
-                innerLoc.push(cellLocation(cp, innerStyle.radius, end));
+                innerLoc.push(calcLocation(cp, innerStyle.radius, end));
 
                 // valueRange
                 var vr = dataTemp[i]/polar[i].max * (radius - ir) + ir;
-                valueRangeLoc.push(cellLocation(cp, vr, end));
+                valueRangeLoc.push(calcLocation(cp, vr, end));
 
                 valueSum += dataTemp[i];
             }
@@ -228,11 +258,9 @@ var Radar = (function(){
                 clearInterval(timer);
             }
 
-            context.clearRect(0, 0, w, h);
+            context.clearRect(redrawPath.x, redrawPath.y, redrawPath.w, redrawPath.h);
             context.fillStyle = "#fff";
-            context.fillRect(0, 0, w, h);
-
-            drawOuter(borderLoc, polar);
+            context.fillRect(redrawPath.x, redrawPath.y, redrawPath.w, redrawPath.h);
 
             drawInner(cp, valueRangeLoc, borderLoc, innerLoc, valueSum);
 
